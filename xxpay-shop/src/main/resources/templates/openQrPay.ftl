@@ -66,7 +66,7 @@
     });
 
     function makeCode () {
-        var elText = document.getElementById("othAmt");
+        var elText = document.getElementById("othAmt");//获取输入的金额
         var amt = $.trim(elText.value);
         var vAmt = (amt/1).toFixed(2);
         if (amt == '') {

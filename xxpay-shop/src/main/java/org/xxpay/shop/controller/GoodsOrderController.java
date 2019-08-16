@@ -173,32 +173,39 @@ public class GoodsOrderController {
         return "openQrPay";
     }
 
+    /**
+     * 实际二维码的地址，也就是手机扫码后访问的地址。
+     * @param model
+     * @param request
+     * @param amount
+     * @return
+     */
     @RequestMapping("/qrPay.html")
     public String qrPay(ModelMap model, HttpServletRequest request, Long amount) {
-        String logPrefix = "【二维码扫码支付】";
-        String view = "qrPay";
+        String logPrefix = "【二维码扫码支付】";//日志前缀
+        String view = "qrPay";//需要跳转的视图
         _log.info("====== 开始接收二维码扫码支付请求 ======");
         String ua = request.getHeader("User-Agent");
         String goodsId = "G_0001";
         _log.info("{}接收参数:goodsId={},amount={},ua={}", logPrefix, goodsId, amount, ua);
-        String client = "alipay";
-        String channelId = "ALIPAY_WAP";
-        if(StringUtils.isBlank(ua)) {
+        String client = "alipay";  //阿里支付
+        String channelId = "ALIPAY_WAP";//手机扫码支付
+        if(StringUtils.isBlank(ua)) {//如果用户客户端为null的话
             String errorMessage = "User-Agent为空！";
-            _log.info("{}信息：{}", logPrefix, errorMessage);
+            _log.info("{}信息：{}", logPrefix, errorMessage);//打印错误信息
             model.put("result", "failed");
             model.put("resMsg", errorMessage);
-            return view;
+            return view;//返回view页面数据
         }else {
-            if(ua.contains("Alipay")) {
-                client = "alipay";
-                channelId = "ALIPAY_WAP";
+            if(ua.contains("Alipay")) {//如果客户端是阿里支付
+                client = "alipay";//设置客户端
+                channelId = "ALIPAY_WAP";//设置通道id
             }else if(ua.contains("MicroMessenger")) {
                 client = "wx";
                 channelId = "WX_JSAPI";
             }
         }
-        if(client == null) {
+        if(client == null) {//如果client为null的话，则提示请用微信或支付宝扫码支付
             String errorMessage = "请用微信或支付宝扫码";
             _log.info("{}信息：{}", logPrefix, errorMessage);
             model.put("result", "failed");
@@ -208,7 +215,7 @@ public class GoodsOrderController {
         // 先插入订单数据
         GoodsOrder goodsOrder = null;
         Map<String, String> orderMap = null;
-        if ("alipay".equals(client)) {
+        if ("alipay".equals(client)) {//如果为支付宝扫码支付
             _log.info("{}{}扫码下单", logPrefix, "支付宝");
             Map params = new HashMap<>();
             params.put("channelId", channelId);
